@@ -1,0 +1,2 @@
+source C:/Workspace/platformIO/ServoMotorZigbee/build/gdbinit/symbols
+source C:/Workspace/platformIO/ServoMotorZigbee/build/gdbinit/connect

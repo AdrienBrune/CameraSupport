@@ -1,12 +1,19 @@
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-CMakeUserPresets.json
+# VSC
+.vscode
+.devcontainer
+
+# CAD
+**/3D parts
+PCB
+
+# ESP IDF
+partitions.csv
+sdkconfig
+sdkconfig.defaults
+sdkconfig.old
+managed_components
+
+build
+.clangd
+help.md
+dependencies.lock

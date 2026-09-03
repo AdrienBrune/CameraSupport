@@ -22,7 +22,7 @@ esp_zb_cluster_list_t *createLevelClusterList()
     esp_zb_cluster_list_t *list = esp_zb_zcl_cluster_list_create();
     
     // BASIC
-    esp_zb_basic_cluster_cfg_t basic_cfg = { .zcl_version = 3, .power_source = 0x03 };
+    esp_zb_basic_cluster_cfg_t basic_cfg = { .zcl_version = 3, .power_source = ESP_ZB_ZCL_BASIC_POWER_SOURCE_MAINS_SINGLE_PHASE };
     esp_zb_attribute_list_t *basic_attr = esp_zb_basic_cluster_create(&basic_cfg);
     esp_zb_basic_cluster_add_attr(basic_attr, ESP_ZB_ZCL_ATTR_BASIC_APPLICATION_VERSION_ID, &appVersion);
     esp_zb_basic_cluster_add_attr(basic_attr, ESP_ZB_ZCL_ATTR_BASIC_STACK_VERSION_ID, &stackVersion);
@@ -30,6 +30,11 @@ esp_zb_cluster_list_t *createLevelClusterList()
     esp_zb_basic_cluster_add_attr(basic_attr, ESP_ZB_ZCL_ATTR_BASIC_MODEL_IDENTIFIER_ID, modelName);
     esp_zb_basic_cluster_add_attr(basic_attr, ESP_ZB_ZCL_ATTR_BASIC_MANUFACTURER_NAME_ID, manufacturerName);
     esp_zb_cluster_list_add_basic_cluster(list, basic_attr, ESP_ZB_ZCL_CLUSTER_SERVER_ROLE);
+
+    // IDENTIFY
+    esp_zb_identify_cluster_cfg_t identify_cfg = { .identify_time = 0 };
+    esp_zb_attribute_list_t *identify_attr = esp_zb_identify_cluster_create(&identify_cfg);
+    esp_zb_cluster_list_add_identify_cluster(list, identify_attr, ESP_ZB_ZCL_CLUSTER_SERVER_ROLE);
 
     // ON/OFF
     static bool onOffValue = true; 
@@ -253,13 +258,26 @@ static esp_err_t zbActionHandler(esp_zb_core_action_callback_id_t callback_id, c
 }
 
 
+// esp_err_t initZigbee()
+// {
+//     esp_zb_cfg_t cfg{};
+//     cfg.esp_zb_role = ESP_ZB_DEVICE_TYPE_ED;
+//     cfg.install_code_policy = false;
+//     cfg.nwk_cfg.zed_cfg.ed_timeout = ESP_ZB_ED_AGING_TIMEOUT_64MIN;
+//     cfg.nwk_cfg.zed_cfg.keep_alive = 30;
+//     esp_zb_init(&cfg);
+
+//     esp_zb_set_rx_on_when_idle(true);
+
+//     return ESP_OK;
+// }
+
 esp_err_t initZigbee()
 {
     esp_zb_cfg_t cfg{};
-    cfg.esp_zb_role = ESP_ZB_DEVICE_TYPE_ED;
+    cfg.esp_zb_role = ESP_ZB_DEVICE_TYPE_ROUTER;
     cfg.install_code_policy = false;
-    cfg.nwk_cfg.zed_cfg.ed_timeout = ESP_ZB_ED_AGING_TIMEOUT_64MIN;
-    cfg.nwk_cfg.zed_cfg.keep_alive = 3600;
+    
     esp_zb_init(&cfg);
 
     return ESP_OK;
@@ -272,7 +290,7 @@ esp_err_t initDevice(void)
 
     // EP 1 - Level control
     esp_zb_endpoint_config_t ep1_config = { .endpoint = EP_SERVOMOTOR, .app_profile_id = ESP_ZB_AF_HA_PROFILE_ID, 
-                                            .app_device_id = ESP_ZB_HA_CUSTOM_TUNNEL_DEVICE_ID, .app_device_version = 0 };
+                                            .app_device_id = ESP_ZB_HA_LEVEL_CONTROLLABLE_OUTPUT_DEVICE_ID, .app_device_version = 0 };
     esp_zb_ep_list_add_ep(ep_list, createLevelClusterList(), ep1_config);
 
     esp_zb_device_register(ep_list);

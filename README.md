@@ -13,8 +13,9 @@
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![Author](https://img.shields.io/badge/author-Adrien%20Brune-orange.svg)
 ![Language](https://img.shields.io/badge/language-C%2F++-yellow.svg)
+![Hardware](https://img.shields.io/badge/hardware-ESP32H2-red.svg)
 ![Protocol](https://img.shields.io/badge/protocol-Zigbee-blueviolet.svg)
-![Platform](https://img.shields.io/badge/platform-ESP32%20%7C%20Home%20Assistant-lightgrey.svg)
+![Platform](https://img.shields.io/badge/platform-Home%20Assistant%20%7C%20Z2M-lightgrey.svg)
 ![Status](https://img.shields.io/badge/status-active-success.svg)
 
 </div>

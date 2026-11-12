@@ -160,7 +160,8 @@ void esp_zb_app_signal_handler(esp_zb_app_signal_t *signal_struct)
         }
         else
         {
-            DebugLogger::getInstance().print(DEBUG_ZIGBEE, DEBUG_INFO, "failed to initialize Zigbee stack (status: %s)", esp_err_to_name(err_status));
+            DebugLogger::getInstance().print(DEBUG_ZIGBEE, DEBUG_WARNING, "failed to initialize Zigbee stack (status: %s), retrying", esp_err_to_name(err_status));
+            esp_zb_scheduler_alarm(bdb_start_top_level_commissioning_cb, ESP_ZB_BDB_MODE_INITIALIZATION, 1000);
         }
         break;
 

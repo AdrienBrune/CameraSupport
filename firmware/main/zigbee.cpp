@@ -55,7 +55,7 @@ esp_zb_cluster_list_t *createLevelClusterList()
     static uint16_t remainingTime = 0;
     static uint16_t transTime = 0;
     static uint8_t  options = 0x00;
-    static uint16_t startUpLevel = 255;
+    static uint8_t  startUpLevel = 255;
 
     esp_zb_level_cluster_add_attr(level_attr, ESP_ZB_ZCL_ATTR_LEVEL_CONTROL_REMAINING_TIME_ID, &remainingTime);
     esp_zb_level_cluster_add_attr(level_attr, ESP_ZB_ZCL_ATTR_LEVEL_CONTROL_MIN_LEVEL_ID, &minLevel);
@@ -146,7 +146,7 @@ void esp_zb_app_signal_handler(esp_zb_app_signal_t *signal_struct)
         if (err_status == ESP_OK)
         {
             DebugLogger::getInstance().print(DEBUG_ZIGBEE, DEBUG_INFO, "Deferred driver initialization ...");
-            DebugLogger::getInstance().print(DEBUG_ZIGBEE, DEBUG_INFO, "Device started up in %s factory-reset mode", esp_zb_bdb_is_factory_new() ? "" : "non");
+            DebugLogger::getInstance().print(DEBUG_ZIGBEE, DEBUG_INFO, "Device started up in %s", esp_zb_bdb_is_factory_new() ? "factory-reset mode" : "NON factory-reset mode");
             if (esp_zb_bdb_is_factory_new())
             {
                 DebugLogger::getInstance().print(DEBUG_ZIGBEE, DEBUG_INFO, "start network steering");
@@ -276,21 +276,6 @@ static esp_err_t zbActionHandler(esp_zb_core_action_callback_id_t callback_id, c
     }
     return ESP_OK;
 }
-
-
-// esp_err_t initZigbee()
-// {
-//     esp_zb_cfg_t cfg{};
-//     cfg.esp_zb_role = ESP_ZB_DEVICE_TYPE_ED;
-//     cfg.install_code_policy = false;
-//     cfg.nwk_cfg.zed_cfg.ed_timeout = ESP_ZB_ED_AGING_TIMEOUT_64MIN;
-//     cfg.nwk_cfg.zed_cfg.keep_alive = 30;
-//     esp_zb_init(&cfg);
-
-//     esp_zb_set_rx_on_when_idle(true);
-
-//     return ESP_OK;
-// }
 
 esp_err_t initZigbee()
 {

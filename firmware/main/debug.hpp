@@ -6,7 +6,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "esp_log.h"
-#include "driver/uart.h"
 
 /* Debug enable per component (empty string = disabled) */
 #define DEBUG_GENERIC   "generic"

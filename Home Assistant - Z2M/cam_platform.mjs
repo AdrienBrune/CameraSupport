@@ -47,6 +47,9 @@ export default {
 
                 return { state: { position: angle } };
             },
+            convertGet: async (entity, key, meta) => {
+                await entity.read('genLevelCtrl', ['currentLevel']);
+            },
         },
     ],
 
@@ -55,7 +58,7 @@ export default {
             type: 'numeric',
             name: 'position',
             property: 'position',
-            access: 7,   // STATE_SET
+            access: 7,   // STATE | SET | GET
             unit: '°',
             value_min: 0,
             value_max: 180,

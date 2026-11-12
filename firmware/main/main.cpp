@@ -7,9 +7,11 @@
 #include "esp_sleep.h"
 #include "debug.hpp"
 #include "servomotor/servo.hpp"
+#include "memory/pers_mem.hpp"
 
 #define PIN_PWM_SERVO 14 // GPIO14
 #define KEEPALIVE_TIMEOUT_MS (uint64_t)(5*60*1000)
+#define SAVE_STABLE_DELAY_MS (uint64_t)(60*1000) // position must be stable this long before being saved in flash
 
 #define USEC_TO_MS  1000
 #define MS_TO_SEC   1000
@@ -22,7 +24,10 @@ void _task_servo(void *pvParameters)
     const int PERIOD_MS = 50;
     int error = 0;
     uint8_t angle = 0, target = 0;
+    uint8_t lastTarget = Servo::GetServoMotor().GetTargetAngle();
+    uint8_t savedAngle = Memory::GetMemory().Get<uint32_t>(DATA_SERVOANGLE);
     TickType_t startTick = xTaskGetTickCount();
+    TickType_t stableTick = xTaskGetTickCount();
 
     DebugLogger::getInstance().print(DEBUG_TASK, DEBUG_ERROR, "SERVO task started");
     while(1)
@@ -30,6 +35,13 @@ void _task_servo(void *pvParameters)
         angle = Servo::GetServoMotor().GetCurrentAngle();
         target = Servo::GetServoMotor().GetTargetAngle();
         error = (int)target - (int)angle;
+
+        // new command received: restart the stability timer
+        if(target != lastTarget)
+        {
+            lastTarget = target;
+            stableTick = xTaskGetTickCount();
+        }
 
         if(error != 0)
         {
@@ -43,6 +55,21 @@ void _task_servo(void *pvParameters)
                 angle = target;
             }
             Servo::GetServoMotor().SetCurrentAngle(angle);
+
+            if(Servo::GetServoMotor().GetCurrentAngle() == target)
+            {
+                // target reached: report the real position to the coordinator
+                startTick = xTaskGetTickCount();
+                sendServoPosition(EP_SERVOMOTOR, target);
+            }
+        }
+
+        // save position in flash only once it has been stable long enough (limits flash writes)
+        if(Servo::GetServoMotor().GetCurrentAngle() == target && target != savedAngle &&
+           (xTaskGetTickCount() - stableTick) >= pdMS_TO_TICKS(SAVE_STABLE_DELAY_MS))
+        {
+            Memory::GetMemory().Set<uint32_t>(DATA_SERVOANGLE, target);
+            savedAngle = target;
         }
 
         if ((xTaskGetTickCount() - startTick) >= pdMS_TO_TICKS(KEEPALIVE_TIMEOUT_MS))
@@ -110,7 +137,7 @@ extern "C" void app_main(void)
 
     DebugLogger::getInstance().print(DEBUG_GENERIC, DEBUG_INFO, "init completed");
 
-    xTaskCreate(_task_zigbee, "zigbee", 8124, NULL, 1, NULL);
+    xTaskCreate(_task_zigbee, "zigbee", 8192., NULL, 1, NULL);
     xTaskCreate(_task_servo, "servo", 4096, NULL, 1, NULL);
 
     // // Enable restart each day to be sure zigbee is synchronized

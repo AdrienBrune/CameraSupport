@@ -67,7 +67,7 @@ void Servo::SetCurrentAngle(uint8_t angle)
 
     if(angle > MAX_ANGLE)
     {
-        DebugLogger::getInstance().print(DEBUG_SERVO, DEBUG_ERROR, "Angle requested superior than 100 degres, forced to 100 degres");
+        DebugLogger::getInstance().print(DEBUG_SERVO, DEBUG_ERROR, "Angle requested superior than %d degres, forced to %d degres", MAX_ANGLE, MAX_ANGLE);
         angle = MAX_ANGLE;
     }
 

@@ -5,7 +5,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <atomic>
-#include "memory/pers_mem.hpp"
 
 #define UNINITIALIZED 0xFF
 
@@ -29,16 +28,8 @@ public:
     void Init(uint32_t pin);
 
     inline uint8_t GetTargetAngle(){ return mTargetAngle.load(); }
-    inline void SetTargetAngle(uint8_t angle)
-    {
-        if(angle != mTargetAngle.load())
-        {
-            mTargetAngle.store(angle);
-
-            // update memory
-            Memory::GetMemory().Set<uint32_t>(DATA_SERVOANGLE, mTargetAngle.load());
-        }
-    }
+    // Memory is updated by the servo task once the position is stable
+    inline void SetTargetAngle(uint8_t angle){ mTargetAngle.store(angle); }
 
     inline uint8_t GetCurrentAngle(){ return mCurrentAngle.load(); }
     void SetCurrentAngle(uint8_t angle);

@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <map>
 #include <mutex>
+#include <cassert>
+#include <type_traits>
 
 #define DATA_SERVOANGLE "servo"
 

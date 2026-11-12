@@ -181,7 +181,26 @@ void esp_zb_app_signal_handler(esp_zb_app_signal_t *signal_struct)
             DebugLogger::getInstance().print(DEBUG_ZIGBEE, DEBUG_INFO, "network steering was not successful (status: %s)", esp_err_to_name(err_status));
             esp_zb_scheduler_alarm((esp_zb_callback_t)bdb_start_top_level_commissioning_cb, ESP_ZB_BDB_MODE_NETWORK_STEERING, 1000);
         }
-        break;        
+        break;
+
+    case ESP_ZB_ZDO_SIGNAL_LEAVE:
+    {
+        auto *leave_params = (esp_zb_zdo_signal_leave_params_t *)esp_zb_app_signal_get_params(p_sg_p);
+        if (leave_params && leave_params->leave_type == ESP_ZB_NWK_LEAVE_TYPE_RESET)
+        {
+            // Device removed from the network (e.g. deleted in Z2M): factory reset then reboot,
+            // the device will restart in factory-new mode and start network steering again
+            DebugLogger::getInstance().print(DEBUG_ZIGBEE, DEBUG_WARNING, "left the network, factory reset");
+            connected.store(false);
+            esp_zb_factory_reset();
+        }
+        else
+        {
+            // Leave with rejoin: the stack rejoins the network by itself
+            DebugLogger::getInstance().print(DEBUG_ZIGBEE, DEBUG_INFO, "left the network with rejoin request");
+        }
+    }
+    break;
 
     default:
         if(sig_type != ESP_ZB_COMMON_SIGNAL_CAN_SLEEP)

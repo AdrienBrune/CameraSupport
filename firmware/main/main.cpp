@@ -60,19 +60,19 @@ void _task_zigbee(void *pvParameters)
     if(initZigbee() != ESP_OK)
     {
         DebugLogger::getInstance().print(DEBUG_TASK, DEBUG_ERROR, "ZIGBEE init failure");
-        return;
+        vTaskDelete(NULL);
     }
 
     if(initDevice() != ESP_OK)
     {
         DebugLogger::getInstance().print(DEBUG_TASK, DEBUG_ERROR, "ZIGBEE device registration failure");
-        return;
+        vTaskDelete(NULL);
     }
 
     if(esp_zb_start(false) != ESP_OK)
     {
         DebugLogger::getInstance().print(DEBUG_TASK, DEBUG_ERROR, "ZIGBEE hasn't started");
-        return;
+        vTaskDelete(NULL);
     }
 
     DebugLogger::getInstance().print(DEBUG_TASK, DEBUG_INFO, "ZIGBEE main loop started");
